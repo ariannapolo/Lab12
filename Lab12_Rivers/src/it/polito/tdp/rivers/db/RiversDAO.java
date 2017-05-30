@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -47,8 +48,12 @@ public class RiversDAO {
 			ResultSet res = st.executeQuery();
 
 			while (res.next()) {
-				flows.add(new Flow(res.getDate("day").toLocalDate(), res.getDouble("flow"),
-						rivers.get(rivers.indexOf(new River(res.getInt("river"))))));
+				
+				River r = rivers.get(rivers.indexOf(new River(res.getInt("river"))));
+				Flow f = new Flow(res.getDate("day").toLocalDate(), res.getDouble("flow"),r);
+				flows.add(f);
+				r.addFlow(f);
+				
 			}
 
 			conn.close();
@@ -60,6 +65,53 @@ public class RiversDAO {
 
 		return flows;
 	}
+	public LocalDate getFirstFlowDate(River r){
+		final String sql = "SELECT MIN(day) from flow where river = ?";
+
+		LocalDate d = null;
+
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, r.getId());
+			ResultSet res = st.executeQuery();
+
+			if (res.next()) {
+				d = res.getDate("MIN(day)").toLocalDate();
+			}
+			conn.close();
+			return d;
+			
+		}catch (SQLException e) {
+				// e.printStackTrace();
+				throw new RuntimeException();
+			}
+
+		
+	}
+	public static LocalDate getLastFlowDate(River r) {
+		final String sql = "SELECT MAX(day) from flow where river = ?";
+
+		LocalDate d = null;
+
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, r.getId());
+			ResultSet res = st.executeQuery();
+
+			if (res.next()) {
+				d = res.getDate("MAX(day)").toLocalDate();
+			}
+			conn.close();
+			return d;
+			
+		}catch (SQLException e) {
+				// e.printStackTrace();
+				throw new RuntimeException();
+			}
+
+	}
 
 	public static void main(String[] args) {
 		RiversDAO dao = new RiversDAO();
@@ -69,7 +121,11 @@ public class RiversDAO {
 
 		List<Flow> flows = dao.getAllFlows(rivers);
 		System.out.format("Loaded %d flows\n", flows.size());
-		// System.out.println(flows) ;
+		//System.out.println(flows) ;
+		System.out.println(getLastFlowDate(new River(2)).toString());
 	}
+
+	
+	
 
 }
