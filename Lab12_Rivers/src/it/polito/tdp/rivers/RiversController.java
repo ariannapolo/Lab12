@@ -9,6 +9,7 @@ import java.util.ResourceBundle;
 
 import it.polito.tdp.rivers.model.Model;
 import it.polito.tdp.rivers.model.River;
+import it.polito.tdp.rivers.model.Simulator;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -61,6 +62,19 @@ public class RiversController {
 
     @FXML
     void doSimula(ActionEvent event) {
+    	
+    	try{
+    	double k = Double.parseDouble(txtK.getText());
+    	Simulator s = new Simulator(this.boxRiver.getValue(),k);
+    	txtResult.setText(s.run());
+    	txtResult.appendText("\nNumero di giorni senza erogazione minima: "+s.getGiorniFail());
+    	txtResult.appendText("\nOccupazione media del bacino: "+s.getCMedia());
+    	
+    	}catch(NumberFormatException nfe){
+    		txtResult.setText(nfe.getMessage());
+    	}
+    	
+    	
 
     }
 

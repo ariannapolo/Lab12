@@ -8,17 +8,19 @@ public class River {
 	private List<Flow> flows;
 	private String name;
 	private int id;
-	
+	private double fMed;
 
 	public River(int id) {
 		this.id = id;
 		flows = new ArrayList<Flow>();
+		fMed = 0;
 	}
 
 	public River(int id, String name) {
 		this.id = id;
 		this.name = name;
 		flows = new ArrayList<Flow>();
+		fMed = 0;
 	}
 
 	public String getName() {
@@ -59,6 +61,9 @@ public class River {
 		return flows.size();
 	}
 	public double getFMedio(){
+		if(fMed!=0){
+			return fMed;
+		}
 		double sum = 0;
 		for(Flow f: flows){
 			sum+= f.getFlow();
